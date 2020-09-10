@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+    }
+
+    #container {
+        width: 600px;
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .cell {
+        height: 6px;
+        width: 6px;
+        box-sizing: border-box;
+        background: white;
+        border: 1px solid #ccc;
+        display: inline-block;
+        vertical-align: top;
+    }
+</style>
+
+<body>
+    <div id="container"></div>
+    <button onclick="save()">save</button>
+    <button onclick="clearFn()">clear</button>
+</body>
+<script>
+    const save = () => {
+        localStorage.setItem('map', JSON.stringify(map))
+    }
+
+    const clearFn = () => {
+        localStorage.clear()
+    }
+
+    const sleep = (t) => {
+        return new Promise(resolve => {
+            setTimeout(() => {
+                resolve()
+            }, t);
+        })
+    }
+
+    const map = localStorage.getItem('map') ? JSON.parse(localStorage.getItem('map')) : Array.from({ length: 10000 }).fill(0)
+    const container = document.getElementById('container')
+    const creatMap = () => {
+        for (let x = 0; x < 100; x++) {
+            for (let y = 0; y < 100; y++) {
+                const cell = document.createElement('div')
+                cell.classList.add('cell')
+                if (map[x * 100 + y] === 1) {
+                    cell.style.background = 'black'
+                }
+
+                cell.addEventListener('mousemove', () => {
+                    if (isClick) {
+                        if (clear) {
+                            cell.style.background = ''
+                            map[x * 100 + y] = 0
+                        } else {
+                            cell.style.background = 'black'
+                            map[x * 100 + y] = 1
+                        }
+                    }
+                })
+                container.appendChild(cell)
+            }
+        }
+    }
+    creatMap()
+
+    let isClick = false
+    let clear = false
+    container.addEventListener('mousedown', (e) => {
+        isClick = true
+        clear = e.which === 3
+    })
+
+    container.addEventListener('mouseup', () => {
+        isClick = false
+    })
+
+    container.addEventListener('contextmenu', (e) => {
+        e.preventDefault()
+    })
+
+    var table
+    const findPath = async (map, start, end) => {
+        const queue = [start] //起点先放入队列
+         table = Object.create(map)
+        const insert = async (x, y, pre) => {
+            if (x < 0 || y < 0 || x >= 100 || y >= 100) { //边界
+                return
+            }
+            if (map[x * 100 + y]) { //有东西占着
+                return
+            }
+            // await sleep(1)
+            map[x * 100 + y] = 2 //覆盖点置为2
+            table[x * 100 + y] = pre
+            container.children[x * 100 + y].style.background = 'red'
+            queue.push([x, y])
+        }
+        while (queue.length) {
+            let [x, y] = queue.shift()
+            // console.log(x, y)
+            if (x === end[0] && y === end[1]) {
+                let path = []
+                while (x != start[0] || y != start[1]) {
+                    path.push(table[x * 100 + y]); //不加分号陷入死循环
+                    [x, y] = table[x * 100 + y]
+                    await sleep(30)
+                    console.log([x, y], table[x * 100 + y] )
+                    container.children[x * 100 + y].style.background = 'yellow'
+                }
+                return path
+            }
+            await insert(x, y - 1, [x, y]); //上
+            await insert(x, y + 1, [x, y]); //下
+            await insert(x - 1, y, [x, y]); //左
+            await insert(x + 1, y, [x, y]); //右
+
+            await insert(x - 1, y - 1, [x, y]); 
+            await insert(x + 1, y + 1, [x, y]); 
+            await insert(x - 1, y + 1, [x, y]);
+            await insert(x + 1, y - 1, [x, y]);
+        }
+        return null
+    }
+
+    // path(map, [5, 20], [8, 20])
+</script>
+
+</html>

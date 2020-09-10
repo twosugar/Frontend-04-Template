@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+</body>
+<script>
+    const regexp = /([0-9\.]+)|([\s\t]+)|([\r\n]+)|(\*)|(\/)|(\+)|(\-)/g
+    const dictionary = ['Number', 'Whitespace', 'LineTerminator', '*', '/', '+', '-']
+
+    const tokenize = (source) => {
+        let result = null;
+        while (true) {
+            result = regexp.exec(source)
+            if (!result) {
+                break
+            }
+
+            for (let i = 1; i < result.length; i++) {
+                if (result[i]) {
+                    console.log(dictionary[i - 1])
+                }
+            }
+            console.log(result)
+        }
+    }
+</script>
+
+</html>

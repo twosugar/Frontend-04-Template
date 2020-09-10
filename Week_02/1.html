@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+    }
+    #container {
+        width: 1200px;
+        display: flex;
+        flex-wrap: wrap;
+    }
+    .cell {
+        height: 10px;
+        width: 10px;
+        box-sizing: border-box;
+        background: white;
+        border: 1px solid #ccc;
+        display: inline-block;
+        vertical-align: top;
+    }
+</style>
+<body>
+    <div id="container"></div>
+    <button onclick="save()">save</button>
+</body>
+<script>
+    const save = () => {
+        localStorage.setItem('map', JSON.stringify(map))
+    }
+
+    const map = localStorage.getItem('map') ? JSON.parse(localStorage.getItem('map')) : Array.from({length: 10000}).fill(0)
+    const container = document.getElementById('container')
+    const creatMap = () => {
+        for (let x = 0; x < 100; x++) {
+            for (let y = 0; y < 100; y++) {
+                const cell = document.createElement('div')
+                cell.classList.add('cell')
+                if (map[x * 100 + y] === 1) {
+                    cell.style.background = 'black'
+                }
+
+                cell.addEventListener('mousemove', () => {
+                    if (isClick) {
+                        if (clear) {
+                            cell.style.background = ''
+                            map[x * 100 + y] = 0
+                        } else {
+                            cell.style.background = 'black'
+                            map[x * 100 + y] = 1
+                        }
+                    }
+                })
+                container.appendChild(cell)
+            }
+        } 
+    }
+    creatMap()
+
+    let isClick = false
+    let clear = false
+    container.addEventListener('mousedown', (e) => {
+        isClick = true
+        clear = e.which === 3
+    })
+
+    container.addEventListener('mouseup', () => {
+        isClick = false
+    })
+
+    container.addEventListener('contextmenu', (e) => {
+        e.preventDefault()
+    })
+</script>
+</html>
