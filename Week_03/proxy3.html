@@ -1,0 +1,34 @@
+<script>
+    const obj = {
+        a: 1,
+        b: 2
+    }
+
+    let callbacks = []
+
+    const po = reactive(obj)
+
+    effect(() => {
+        console.log('set')
+    })
+
+    function effect(callback) {
+        callbacks.push(callback)
+    }
+
+    function reactive(obj) {
+        return new Proxy(obj, {
+            set(obj, prop, value) {
+                obj[prop] = value
+                for (const it of callbacks) {
+                    it && it()
+                }
+            },
+
+            get(obj, prop) {
+                console.log('get', obj, prop)
+                return obj[prop]
+            }
+        })
+    }
+</script>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div>字典数</div>
+</body>
+<script>
+    const $ = Symbol('$')
+    class Trie {
+        constructor() {
+            this.root = Object.create(null)
+        }
+
+        insert(str) {
+            let node = this.root
+            for (const it of str) {
+               if (!node[it]) {
+                    node[it] = Object.create(null)
+               }
+               node = node[it] //定位到下一层
+            }
+            if (!($ in node)) {
+                node[$] = 0
+            }
+
+            node[$] ++
+        }
+
+        most() {
+            let max = 0
+            let maxStr = ''
+            function visit(node, word) {
+                if (node[$] && node[$] > max) {
+                    max = node[$]
+                    maxStr = word
+                }
+                for (const p in node) {
+                     visit(node[p], word + p)
+                }
+            }
+            visit(this.root, '')
+            console.log(max, maxStr)
+        }
+    }
+
+    function randomWord(length) {
+        let str = ''
+        for (let i = 0; i < length; i++) {
+            str = str + String.fromCharCode(Math.random() * 26 + 'a'.charCodeAt(0))
+        }
+        return str
+    }
+
+    const trie = new Trie()
+
+    for (let i = 0; i < 10000; i++) {
+        const a = randomWord(4)
+        trie.insert(a)
+    }
+</script>
+</html>
