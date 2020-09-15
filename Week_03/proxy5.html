@@ -1,0 +1,62 @@
+<script>
+    const obj = {
+        a: {
+            c: 99
+        },
+        b: 2
+    }
+
+    let callbacks = new Map()
+
+    let usedReactives = []
+
+    let reactives = new Map()
+
+    const po = reactive(obj)
+
+    effect(() => {
+        console.log('set', po.a.c) // 访问了get
+    })
+
+    function effect(callback) {
+        usedReactives = []
+        callback()
+        console.log('usedReactives', usedReactives)
+        for (const it of usedReactives) {
+            if (!callbacks.has(it[0])) {
+                callbacks.set(it[0], new Map())
+            }
+            if (!callbacks.get(it[0]).has(it[1])) {
+                callbacks.get(it[0]).set(it[1], [])
+            }
+            callbacks.get(it[0]).get(it[1]).push(callback)
+        }
+    }
+
+    function reactive(obj) {
+        if (reactives.has(obj)) { //存在，调用之前创建的proxy
+            return reactives.get(obj)
+        }
+        let proxy = new Proxy(obj, {
+            set(obj, prop, value) {
+                obj[prop] = value
+                if (callbacks.get(obj) && callbacks.get(obj).get(prop)) {
+                    for (const callback of callbacks.get(obj) && callbacks.get(obj).get(prop)) {
+                        callback()
+                    }
+                }
+                return obj[prop]
+            },
+
+            get(obj, prop) {
+                usedReactives.push([obj, prop])
+                if (typeof obj[prop] === 'object') {
+                    return reactive(obj[prop])
+                }
+                return obj[prop]
+            }
+        })
+        reactives.set(obj, proxy)
+        return proxy
+    }
+</script>
