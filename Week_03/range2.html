@@ -1,0 +1,66 @@
+<div id="container">
+    这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿
+    这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿
+    这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿
+    这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿
+    这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿
+    这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿
+    这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿
+    这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿
+    这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿这是文字问问大阿斯顿
+</div>
+<div id="dragable" style="height: 100px;width: 100px;background: cadetblue;display: inline-block;"></div>
+
+<script>
+    const drag = document.getElementById('dragable')
+    let baseX = 0, baseY = 0
+    drag.addEventListener('mousedown', event => {
+        console.log(event)
+        const startX = event.clientX, startY = event.clientY
+
+        const up = e => {
+            baseX = baseX + e.clientX - startX
+            baseY = baseY + e.clientY - startY
+            document.removeEventListener('mousemove', move)
+            document.removeEventListener('mouseup', up)
+        }
+
+        const move = (e) => {
+            let range = getNearset(e.clientX, e.clientY)
+            range.insertNode(drag)
+            // drag.style.transform = `translate(${baseX + e.clientX - startX}px, ${baseY + e.clientY - startY}px)`
+        }
+
+        document.addEventListener('mousemove', move)
+
+        document.addEventListener('mouseup', up)
+    })
+
+    const container = document.getElementById('container')
+
+    const ranges = []
+
+    for (let i = 0; i < container.childNodes[0].textContent.length; i++) {
+        const range = document.createRange()
+        range.setStart(container.childNodes[0], i)
+        range.setEnd(container.childNodes[0], i)
+        ranges.push(range)
+    }
+
+    const getNearset = (x, y) => {
+        let min = Infinity //无穷大
+        let nearset = null
+        for (const range of ranges) {
+            const rect = range.getBoundingClientRect()
+            let distance = (rect.x - x) ** 2 + (rect.y - y) ** 2
+            if (distance < min) {
+                min = distance
+                nearset = range
+            }
+        }
+
+        return nearset
+    } 
+
+    document.addEventListener('selectstart', e => e.preventDefault())
+</script>
